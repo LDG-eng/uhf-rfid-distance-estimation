@@ -42,19 +42,43 @@ and validate the effectiveness of the proposed filtering algorithm.
 
 ## Calibration Procedure
 
-Before distance estimation:
+To derive the log-distance path loss model parameters (P0 and n),
+RSSI measurements were collected at multiple known distances.
 
-1. Measure average RSSI at 1.0 m → determine P0
-2. Measure average RSSI at 3.0 m → compute path-loss exponent n
+### Measurement Positions
 
-Model:
+RSSI samples were collected at the following distances (meters):
 
-RSSI = P0 − 10n log10(d)
+0.1, 0.3, 0.5, 0.7, 0.9,
+1.1, 1.3, 1.5, 1.7, 2.0
 
-Estimated parameters:
+### Sampling Configuration
 
-- P0 = -64.91 dBm
-- n = 1.769
+- Samples per position: 300
+- Initial samples discarded: 5
+
+### Parameter Estimation Method
+
+For each distance, the average RSSI value was computed after
+discarding the initial unstable samples.
+
+Using the log-distance path loss model:
+
+RSSI(d) = P0 − 10n log10(d)
+
+Linear regression was performed on:
+
+log10(d) vs RSSI(d)
+
+to estimate:
+
+- P0 (reference power)
+- n (path-loss exponent)
+
+The final model parameters used in this study were:
+
+P0 = -64.91 dBm  
+n = 1.769
 
 ---
 
