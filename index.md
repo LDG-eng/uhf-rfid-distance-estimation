@@ -1,25 +1,48 @@
-# UHF RFID Distance Estimation
-
-## Overview
-
-Embedded real-time distance estimation system using R200 UHF RFID hardware.
-
-Multi-stage RSSI stabilization pipeline:
-
-- Physical threshold filtering
-- Statistical outlier rejection
-- Adaptive weighted averaging
-- Distance-domain inertia filtering
+# UHF RFID Distance Estimation  
+### Real-Time Embedded RSSI Stabilization on R200 UHF Hardware
 
 ---
 
-## System Architecture
+## 🚀 Project Summary
+
+This project implements a **multi-stage RSSI filtering pipeline**
+to improve distance estimation stability in UHF RFID systems.
+
+**Measured Improvements:**
+
+- 🔹 **MAE reduced by 5.7%**
+- 🔹 **RMSE reduced by 8.2%**
+- 🔹 **Accuracy improved by +9.1%p**
+
+---
+
+## 🧠 System Architecture
 
 ![System Diagram](assets/images/Schematic.JPG)
 
+Pipeline:
+
+Raw RSSI  
+→ Threshold Filtering  
+→ Sliding Window  
+→ Statistical Outlier Rejection  
+→ Adaptive Weighted Averaging  
+→ Log-Distance Model  
+→ Distance Inertia Filter  
+
 ---
 
-## Performance Improvement
+## 📊 Filtering Effect
+
+Example at 1.6m (spike suppression):
+
+![RSSI Filtering](assets/images/rssi-filtering-effect.png)
+
+---
+
+## 📈 Quantitative Results
+
+### Overall Performance
 
 | Metric | Raw | Filtered |
 |--------|------|----------|
@@ -29,24 +52,35 @@ Multi-stage RSSI stabilization pipeline:
 
 ---
 
-## Filtering Effect Example
-
-![RSSI Filtering](assets/images/rssi-filtering-effect.png)
-
----
-
-## Distance-wise Error Comparison
+### Distance-wise Error Comparison
 
 ![MAE](assets/images/mae-comparison.png)
+
 ![RMSE](assets/images/rmse-comparison.png)
+
 ![Accuracy](assets/images/accuracy-comparison.png)
 
 ---
 
-## Key Contributions
+## 🔬 Technical Highlights
 
-- Embedded multi-stage RSSI stabilization
-- Statistical outlier rejection
-- Adaptive weighted averaging
-- Distance-domain inertia filtering
-- Quantitative performance validation
+- Embedded implementation (firmware-level filtering)
+- Multi-point regression-based path loss calibration
+- Real-time sliding window statistical processing
+- Distance-domain temporal stabilization
+- Experimental validation using 300 samples × 10 positions
+
+---
+
+## 📁 Repository Structure
+
+- `firmware/` → Embedded implementation  
+- `docs/` → Experimental documentation  
+- `data/` → Raw & processed measurement data  
+- `assets/` → Graphs and diagrams  
+
+---
+
+## 📌 License
+
+MIT License
