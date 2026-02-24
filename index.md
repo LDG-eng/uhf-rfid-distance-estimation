@@ -64,7 +64,6 @@ where:
 - RSSI: Measured RSSI in dBm
 - d: Estimated distance in meters
 
-
 **Parameter Derivation:** Multi-point regression from experimental RSSI measurements at known distances.
 
 ---
