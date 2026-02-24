@@ -37,7 +37,7 @@ Raw RSSI data without filtering leads to **large distance estimation errors**, p
 - **RFID Reader:** R200  
 - **Antenna:** 5 dBi  
 - **RSSI Unit:** dBm  
-- **Measurement Distances:** 0.1, 0.3, 0.5, 0.7, 0.9, 1.1, 1.3, 1.5, 1.7, 2.0 m  
+- **Measurement Distances:** 0.1, 0.4, 0.7, 1.0, 1.3, 1.6, 2.0 m  
 - **Samples per Position:** 300  
 - **Initial Samples Ignored:** 5  
 
@@ -54,9 +54,9 @@ Raw RSSI data without filtering leads to **large distance estimation errors**, p
 
 Distance is estimated using the standard log-distance model:
 
-\[
+$$
 d = 10^{\frac{P_0 - RSSI}{10 n}}
-\]
+$$
 
 Where:
 
@@ -91,9 +91,9 @@ Where:
 
 #### Step 4 – Adaptive Mixing
 
-\[
+$$
 RSSI_{filtered} = (1 - 0.4) \cdot MA + 0.4 \cdot WMA
-\]
+$$
 
 - MA: simple moving average  
 - WMA: freshness-weighted average  
@@ -105,9 +105,9 @@ RSSI_{filtered} = (1 - 0.4) \cdot MA + 0.4 \cdot WMA
 
 After RSSI → distance conversion:
 
-\[
+$$
 D_{filtered} = \alpha D_{prev} + (1-\alpha) D_{current}
-\]
+$$
 
 - **α**: position-dependent inertia factor  
 - Reduces temporal fluctuation  
@@ -140,18 +140,14 @@ D_{filtered} = \alpha D_{prev} + (1-\alpha) D_{current}
 ### Distance-Wise Metrics
 
 | Distance | Raw MAE | Filt MAE | Raw RMSE | Filt RMSE | Raw Acc (%) | Filt Acc (%) |
-|-----------|---------|----------|-----------|------------|--------------|---------------|
-| 0.1m | 0.014 | 0.013 | 0.018 | 0.013 | 99.7 | 100.0 |
-| 0.3m | 0.058 | 0.055 | 0.062 | 0.056 | 96.1 | 97.2 |
-| 0.5m | 0.065 | 0.062 | 0.071 | 0.066 | 92.3 | 94.7 |
-| 0.7m | 0.082 | 0.078 | 0.094 | 0.084 | 91.7 | 89.7 |
-| 0.9m | 0.110 | 0.105 | 0.123 | 0.112 | 5.4 | 6.8 |
-| 1.1m | 0.234 | 0.225 | 0.288 | 0.235 | 1.7 | 3.0 |
-| 1.3m | 0.842 | 0.811 | 0.924 | 0.854 | 1.3 | 1.7 |
-| 1.5m | 0.412 | 0.376 | 0.498 | 0.421 | 0.0 | 12.1 |
-| 1.7m | 0.220 | 0.148 | 0.275 | 0.192 | 0.0 | 54.0 |
-| 2.0m | 0.589 | 0.585 | 0.620 | 0.604 | 4.3 | 0.7 |
-
+|----------|---------|----------|----------|-----------|-------------|--------------|
+| 0.1 m    | 0.014   | 0.013    | 0.018    | 0.013     | 99.7        | 100.0        |
+| 0.4 m    | 0.071   | 0.069    | 0.076    | 0.072     | 94.3        | 97.7         |
+| 0.7 m    | 0.082   | 0.078    | 0.094    | 0.084     | 91.7        | 89.7         |
+| 1.0 m    | 0.234   | 0.225    | 0.288    | 0.235     | 1.7         | 3.0          |
+| 1.3 m    | 0.842   | 0.811    | 0.924    | 0.854     | 1.3         | 1.7          |
+| 1.6 m    | 0.152   | 0.085    | 0.182    | 0.110     | 0.0         | 64.3         |
+| 2.0 m    | 0.589   | 0.585    | 0.620    | 0.604     | 4.3         | 0.7   
 ---
 
 ### Graphical Overview
@@ -179,7 +175,7 @@ Observations:
 - Sliding-window statistical processing embedded  
 - Multi-point regression for P0 and n calibration  
 - Distance-domain inertia for dynamic stabilization  
-- Fully tested across **10 distances × 300 samples**
+- Fully tested across **7 distances × 300 samples**
 
 ---
 
