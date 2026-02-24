@@ -75,3 +75,10 @@ extreme deviations were effectively mitigated.
 
 Overall, the layered filtering architecture improves
 practical indoor distance estimation reliability.
+
+
+## Limitations
+
+- Mid-range distances (1.0–1.3 m) show instability
+- Multipath interference not explicitly modeled
+- Environment-specific calibration required
