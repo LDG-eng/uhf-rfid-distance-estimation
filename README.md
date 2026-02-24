@@ -113,3 +113,11 @@ docs/ → System architecture and experiment documentation
 - Distance-domain inertia compensation
 - Quantitative performance validation
 
+
+## 🚀 Quick Start
+
+1. Flash firmware/main to R200 controller
+2. Collect RSSI data via serial interface
+3. Run calibration to estimate P0 and n
+4. Process raw data using filtering pipeline
+5. Evaluate performance metrics
