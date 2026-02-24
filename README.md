@@ -94,3 +94,21 @@ docs/ → System architecture and experiment documentation
 - Adaptive weighted averaging
 - Distance-domain inertia compensation
 - Quantitative performance validation
+
+---
+
+## Visualization
+
+### System Block Diagram
+![System Diagram](assets/images/system-block-diagram.png)
+
+### RSSI Filtering Effect
+![RSSI Filtering](assets/images/rssi-filtering-effect.png)
+
+### Distance Estimation Comparison
+![Distance Comparison](assets/images/distance-estimation-comparison.png)
+
+### Error Metrics by Distance
+![MAE](assets/images/mae-comparison.png)
+![RMSE](assets/images/rmse-comparison.png)
+![Accuracy](assets/images/accuracy-comparison.png)
