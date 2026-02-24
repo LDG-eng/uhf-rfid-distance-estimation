@@ -58,13 +58,12 @@ d = 10^((P0 - RSSI) / (10 * n))
 
 where:
 - P0: Reference power at 1 meter (dBm)
+  P0 = - 64.91 dBm
 - n: Path-loss exponent
+  n = 1.769
 - RSSI: Measured RSSI in dBm
 - d: Estimated distance in meters
 
-- P_0 = - 64.91 dBm  
-- n = 1.769
-  
 
 **Parameter Derivation:** Multi-point regression from experimental RSSI measurements at known distances.
 
