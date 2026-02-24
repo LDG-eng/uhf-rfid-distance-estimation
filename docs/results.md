@@ -82,3 +82,11 @@ practical indoor distance estimation reliability.
 - Mid-range distances (1.0–1.3 m) show instability
 - Multipath interference not explicitly modeled
 - Environment-specific calibration required
+
+
+## Future Work
+
+- Adaptive path-loss exponent estimation
+- Kalman filtering in distance domain
+- Multi-antenna fusion
+- Machine-learning-based RSSI regression
