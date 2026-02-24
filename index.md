@@ -15,7 +15,7 @@ Multi-stage RSSI stabilization pipeline:
 
 ## System Architecture
 
-![System Diagram](assets/images/system-block-diagram.png)
+![System Diagram](assets/images/Schematic.JPG)
 
 ---
 
