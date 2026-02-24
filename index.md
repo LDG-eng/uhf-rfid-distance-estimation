@@ -1,3 +1,6 @@
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+
 # UHF RFID Distance Estimation System
 ### Real-Time Embedded RSSI Stabilization & Distance Measurement on R200
 
