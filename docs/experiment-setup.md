@@ -1,100 +1,71 @@
 # Experiment Setup
 
-## 1. Objective
+## Objective
 
-To evaluate the effectiveness of the proposed multi-stage hybrid filtering algorithm in improving RSSI-based distance estimation accuracy.
-
-The performance comparison was conducted between:
-
-- Raw RSSI-based distance estimation
-- Filtered RSSI-based distance estimation
+To evaluate RSSI-based distance estimation accuracy
+and validate the effectiveness of the proposed filtering algorithm.
 
 ---
 
-## 2. Experimental Environment
+## Hardware Configuration
 
 - RFID Reader: R200
-- Antenna: 5dBi
+- Antenna: 5 dBi
+- Operating Frequency: UHF band
 - RSSI Unit: dBm
-- Environment: Indoor environment (line-of-sight condition)
-- Measurement Range: 0.1m – 2.0m
-
-Distance measurement points:
-
-0.1m, 0.4m, 0.7m, 1.0m, 1.3m, 1.6m, 2.0m
+- Microcontroller: Arduino-compatible board
+- Communication: SoftwareSerial (115200 baud)
 
 ---
 
-## 3. Data Collection Method
+## Measurement Environment
 
-- Samples per distance: 300
-- Initial unstable samples ignored: 5
-
-RSSI values were continuously collected via serial communication and processed in real time.
-
-Each distance position was evaluated independently.
+- Indoor environment
+- Line-of-sight (LOS) condition
+- Minimal human movement during measurement
+- Tag fixed on non-metallic surface
 
 ---
 
-## 4. Distance Estimation Process
+## Measurement Procedure
 
-For each sample:
-
-1. Raw RSSI → Direct distance conversion (log-distance model)
-2. Filtered RSSI → Hybrid filtering → Distance conversion
-3. Distance-domain inertia applied (filtered case only)
-
-Both results were recorded for performance comparison.
-
----
-
-## 5. Performance Metrics
-
-The following metrics were used:
-
-### 5.1 MAE (Mean Absolute Error)
-
-MAE = mean(|estimated distance − actual distance|)
-
-Indicates average estimation error magnitude.
+1. Place the RFID tag at predefined distances.
+2. Measurement range: 0.1 m to 2.0 m
+3. Step interval: 0.1 m
+4. Collect 300 RSSI samples per position.
+5. Ignore first 5 samples (stabilization phase).
+6. Apply RSSI filtering pipeline.
+7. Convert RSSI to distance using log-distance model.
+8. Apply distance-domain inertia filtering.
 
 ---
 
-### 5.2 RMSE (Root Mean Square Error)
+## Calibration Procedure
 
-RMSE = sqrt(mean((estimated distance − actual distance)^2))
+Before distance estimation:
 
-Sensitive to large error spikes.
+1. Measure average RSSI at 1.0 m → determine P0
+2. Measure average RSSI at 3.0 m → compute path-loss exponent n
 
----
+Model:
 
-### 5.3 Accuracy (≤ 0.10m)
+RSSI = P0 − 10n log10(d)
 
-Accuracy (%) =
-(Number of samples with |error| ≤ 0.10m / Total samples) × 100
+Estimated parameters:
 
-This metric evaluates practical positioning reliability.
-
----
-
-## 6. Evaluation Strategy
-
-Performance was compared between:
-
-- Raw estimation
-- Filtered estimation
-
-Improvement was evaluated using:
-
-- MAE reduction rate
-- RMSE reduction rate
-- Accuracy increase (percentage point gain)
+- P0 = -64.91 dBm
+- n = 1.769
 
 ---
 
-## 7. Key Evaluation Focus
+## Accuracy Metric
 
-- Stability improvement under RSSI fluctuation
-- Spike noise suppression effectiveness
-- Improvement in short-range precision
-- Overall estimation reliability within ±0.10m
+Accuracy criterion:
+
+±0.10 m from ground-truth distance
+
+Performance metrics:
+
+- MAE (Mean Absolute Error)
+- RMSE (Root Mean Square Error)
+- Accuracy (within ±0.10 m)
