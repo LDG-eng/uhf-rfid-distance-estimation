@@ -54,15 +54,17 @@ Raw RSSI data without filtering leads to **large distance estimation errors**, p
 
 Distance is estimated using the standard log-distance model:
 
-$$
-d = 10^{\frac{P_0 - RSSI}{10 n}}
-$$
+d = 10^((P0 - RSSI) / (10 * n))
 
-Where:
+where:
+- P0: Reference power at 1 meter (dBm)
+- n: Path-loss exponent
+- RSSI: Measured RSSI in dBm
+- d: Estimated distance in meters
 
-- \(P_0 = -64.91\) dBm  
-- \(n = 1.769\)  
-- RSSI in dBm, d in meters  
+- P_0 = - 64.91 dBm  
+- n = 1.769
+  
 
 **Parameter Derivation:** Multi-point regression from experimental RSSI measurements at known distances.
 
@@ -91,9 +93,7 @@ Where:
 
 #### Step 4 – Adaptive Mixing
 
-$$
-RSSI_{filtered} = (1 - 0.4) \cdot MA + 0.4 \cdot WMA
-$$
+Filtered RSSI = (1 - 0.4) * Moving Average + 0.4 * Weighted Average
 
 - MA: simple moving average  
 - WMA: freshness-weighted average  
@@ -105,9 +105,7 @@ $$
 
 After RSSI → distance conversion:
 
-$$
-D_{filtered} = \alpha D_{prev} + (1-\alpha) D_{current}
-$$
+Filtered Distance = alpha * Previous Distance + (1 - alpha) * Current Distance
 
 - **α**: position-dependent inertia factor  
 - Reduces temporal fluctuation  
