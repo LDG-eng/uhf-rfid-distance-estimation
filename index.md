@@ -1,3 +1,10 @@
+---
+layout: default
+title: UHF RFID Distance Estimation
+description: Embedded multi-stage RSSI stabilization and real-time distance estimation using R200 hardware
+---
+
+
 # UHF RFID Distance Estimation System
 ### Real-Time Embedded RSSI Stabilization & Distance Measurement on R200
 
