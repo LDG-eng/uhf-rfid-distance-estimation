@@ -71,6 +71,24 @@ Where:
 | RMSE | 0.442 m | 0.410 m |
 | Accuracy (≤0.10m) | 41.9% | 51.0% |
 
+---
+
+## Visualization
+
+### System Block Diagram
+![System Diagram](assets/images/Schematic.JPG)
+
+### RSSI Filtering Effect
+![RSSI Filtering](assets/images/rssi-filtering-effect.png)
+
+### Distance Estimation Comparison
+![Distance Comparison](assets/images/distance-estimation-comparison.png)
+
+### Error Metrics by Distance
+![MAE](assets/images/mae-comparison.png)
+![RMSE](assets/images/rmse-comparison.png)
+![Accuracy](assets/images/accuracy-comparison.png)
+
 ### Performance Improvement
 
 - MAE reduced by 5.7%
@@ -95,20 +113,3 @@ docs/ → System architecture and experiment documentation
 - Distance-domain inertia compensation
 - Quantitative performance validation
 
----
-
-## Visualization
-
-### System Block Diagram
-![System Diagram](assets/images/Schematic.JPG)
-
-### RSSI Filtering Effect
-![RSSI Filtering](assets/images/rssi-filtering-effect.png)
-
-### Distance Estimation Comparison
-![Distance Comparison](assets/images/distance-estimation-comparison.png)
-
-### Error Metrics by Distance
-![MAE](assets/images/mae-comparison.png)
-![RMSE](assets/images/rmse-comparison.png)
-![Accuracy](assets/images/accuracy-comparison.png)
