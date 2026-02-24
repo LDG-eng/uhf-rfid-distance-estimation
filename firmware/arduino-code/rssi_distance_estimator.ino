@@ -1,3 +1,14 @@
+/*
+ Project: UHF RFID RSSI Distance Estimation
+ Hardware: R200 + 5dBi antenna
+ Author: LEE-DG
+ Description:
+   - RSSI-based distance estimation
+   - Hybrid RSSI filtering
+   - Distance-domain inertia compensation
+   - Real-time MAE / RMSE / Accuracy evaluation
+*/
+
 #include <SoftwareSerial.h>
 #include <math.h>
 // ==================== 모델 파라미터 (가장 중요!) ====================
