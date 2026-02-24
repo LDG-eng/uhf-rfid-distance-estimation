@@ -1,9 +1,16 @@
-# UHF RFID Distance Estimation System
-UHF RFID RSSI-based distance estimation system with noise reduction filtering
+# 📡 UHF RFID Distance Estimation with Multi-Stage RSSI Stabilization
 
-## Overview
-This project implements an RSSI-based distance estimation system using a UHF RFID R200 reader and a 5dBi antenna.  
-A multi-stage hybrid filtering algorithm was designed and implemented on an embedded system to improve distance estimation stability under noisy RF conditions.
+> **An embedded distance estimation system utilizing an R200 UHF RFID reader and a 5dBi antenna, featuring a custom real-time noise reduction pipeline.**
+
+## 📌 Overview
+Estimating distance using UHF RFID RSSI (Received Signal Strength Indicator) is highly susceptible to multipath fading and environmental noise. This project implements a **multi-stage hybrid filtering algorithm** directly onto an embedded system to stabilize raw RSSI data in real-time. 
+
+By optimizing the Log-Distance Path Loss model for a specific RF environment, the system effectively suppresses signal spikes and improves distance estimation reliability under noisy conditions.
+
+## 🚀 Key Achievements
+* **Algorithmic Optimization:** Designed and implemented a lightweight, real-time RSSI filtering pipeline suitable for embedded environments.
+* **Error Reduction:** Successfully suppressed multipath spikes, achieving an **8.2% reduction in RMSE**.
+* **Accuracy Improvement:** Improved overall distance estimation accuracy by **9.1%p**, with near 100% reliability in short-range (< 0.4m) measurements.
 
 ---
 
