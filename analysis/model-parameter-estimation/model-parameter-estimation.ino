@@ -1,22 +1,25 @@
-%% UHF RFID Log-Distance Model Parameter Estimation
-%
-% Purpose:
-% Estimate P0 and path-loss exponent (n)
-% using measured RSSI values at known distances.
-%
-% Model:
-% RSSI = P0 − 10n log10(d)
-%
-% Input:
-% - Distance in meters
-% - RSSI in dBm
-%
-% Output:
-% - P0 (reference power at 1m)
-% - n (path-loss exponent)
-%
-% The estimated parameters are used in firmware
-% for real-time distance estimation.
+/*
+============================================================
+UHF RFID Log-Distance Model Parameter Estimation (Arduino)
+
+Purpose:
+Estimate P0 and path-loss exponent (n)
+using measured RSSI values at known distances.
+
+Model:
+RSSI = P0 − 10n log10(d)
+
+Procedure:
+1. Measure average RSSI at reference distance D0 (1m)
+   → P0 = average RSSI at 1m
+2. Measure average RSSI at D1 (e.g., 3m)
+3. Compute:
+   n = (P0 − RSSI_D1) / (10 log10(D1 / D0))
+
+The estimated values are copied into the main firmware
+for real-time distance estimation.
+============================================================
+*/
 
 
 #include <SoftwareSerial.h>
