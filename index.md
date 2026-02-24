@@ -18,7 +18,7 @@ to improve distance estimation stability in UHF RFID systems.
 
 ## 🧠 System Architecture
 
-![System Diagram](assets/images/Schematic.JPG)
+![System Diagram](assets/images/system-block-diagram.png)
 
 Pipeline:
 
