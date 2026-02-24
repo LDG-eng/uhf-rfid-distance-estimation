@@ -13,3 +13,7 @@ Includes:
    - MAE per distance  
    - RMSE per distance  
    - Accuracy per distance  
+
+Typical format:
+
+distance_m, raw_mae, filtered_mae, raw_rmse, filtered_rmse, raw_accuracy, filtered_accuracy
