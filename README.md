@@ -100,7 +100,7 @@ docs/ → System architecture and experiment documentation
 ## Visualization
 
 ### System Block Diagram
-![System Diagram](assets/images/Schematic.png)
+![System Diagram](assets/images/Schematic.JPG)
 
 ### RSSI Filtering Effect
 ![RSSI Filtering](assets/images/rssi-filtering-effect.png)
