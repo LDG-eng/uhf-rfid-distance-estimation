@@ -1,8 +1,3 @@
 title: UHF RFID Distance Estimation
 description: Embedded multi-stage RSSI stabilization and real-time distance estimation using R200 hardware
 theme: jekyll-theme-cayman
-markdown: kramdown
-kramdown:
-  math_engine: mathjax
-  syntax_highlighter_opts:
-    guess_lang: false
