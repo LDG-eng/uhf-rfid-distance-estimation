@@ -1,23 +1,24 @@
 /*
 ============================================================
-UHF RFID Log-Distance Model Parameter Estimation (Arduino)
+[UHF RFID Log-Distance Model Data Collector]
 
-Purpose:
-Estimate P0 and path-loss exponent (n)
-using measured RSSI values at known distances.
+Description:
+Collects RSSI samples at predefined distances to estimate 
+path-loss parameters (P0, n) for environment-specific calibration.
 
-Model:
-RSSI = P0 − 10n log10(d)
+Hardware Interface:
+- Button (Pin 9): Trigger measurement start
+- Blue LED (Pin 13): Measuring status
+- Yellow LED (Pin 12): Idle/Wait status
+- Buzzer (Pin 8): Start/Finish notification
 
-Procedure:
-1. Measure average RSSI at reference distance D0 (1m)
-   → P0 = average RSSI at 1m
-2. Measure average RSSI at D1 (e.g., 3m)
-3. Compute:
-   n = (P0 − RSSI_D1) / (10 log10(D1 / D0))
+Calibration Formula:
+RSSI = P0 - 10 * n * log10(d)
 
-The estimated values are copied into the main firmware
-for real-time distance estimation.
+Workflow:
+1. Place tag at target distance (0.1m to 2.0m).
+2. Press button to collect 300 samples.
+3. Use averaged results to calculate P0 and n via Least Squares Method.
 ============================================================
 */
 
@@ -25,146 +26,160 @@ for real-time distance estimation.
 #include <SoftwareSerial.h>
 #include <math.h>
 
-// ==================== 보정 설정 ====================
-// 평균 계산에 사용할 RSSI 샘플 개수
-#define CALIBRATION_SAMPLES   100
-// P0 측정을 위한 기준 거리 (미터)
-#define D0_METER              1.0f
-// n 계산을 위한 두 번째 측정 거리 (미터)
-#define D1_METER              3.0f
-// ====================================================
+// ==================== 설정 (Settings) ====================
+// 1. 데이터를 수집할 거리 목록 (미터 단위)
+const float positions_to_collect[] = {0.1, 0.3, 0.5, 0.7, 0.9, 1.1, 1.3, 1.5, 1.7, 2.0};
+
+// 2. 한 위치 당 수집할 RSSI 샘플 개수
+#define SAMPLES_PER_POSITION 300
+// =======================================================
 
 
 // ------------------- Arduino Pin setting ------------------
-#define RFID_RX          10
-#define RFID_TX          11
+// ⭐⭐ 요청사항 반영: 핀 정의 수정 및 추가 ⭐⭐
+#define RFID_RX           10
+#define RFID_TX           11
 SoftwareSerial RFID_Serial(RFID_RX, RFID_TX);
 #define Monitor_Serial Serial
-#define LED_PIN          13   // 상태 표시용 LED
-#define BUTTON_PIN       8
+#define BLUE_LED          13  // 측정 중 LED
+#define YELLOW_LED        12  // 대기 중 LED
+#define BUTTON_PIN        9   // 9번 핀 스위치
+#define BUZZER_PIN        8   // 8번 핀 부저
 // ----------------------------------------------------------
 
 
 // ------------------------ 전역 변수 ------------------------
-int currentState = 0; // 0: 대기, 1: P0 측정, 2: D1 대기, 3: D1 측정, 4: 계산 및 완료
-float p0_value = 0;
+const int num_positions = sizeof(positions_to_collect) / sizeof(float);
+int current_pos_index = 0;
+int program_state = 0; // 0: 대기, 1: 측정 중
+
+long reading_count = 0;
+float rssi_sum = 0;
 // ----------------------------------------------------------
 
-// RFID 읽기 명령
-byte ReadMulti[10] = {0xAA, 0x00, 0x27, 0x00, 0x03, 0x22, 0xFF, 0xFF, 0x4A, 0xDD};
+byte ReadMulti[10] = {0xAA, 0x00, 0x27, 0x00, 0x03, 0.22, 0xFF, 0xFF, 0x4A, 0xDD};
 
 
 void setup() {
-  pinMode(LED_PIN, OUTPUT);
-  pinMode(BUTTON_PIN, INPUT_PULLUP);
+  // ⭐⭐ 요청사항 반영: 핀 모드 설정 ⭐⭐
+  pinMode(BLUE_LED, OUTPUT);
+  pinMode(YELLOW_LED, OUTPUT);
+  pinMode(BUZZER_PIN, OUTPUT);
+  pinMode(BUTTON_PIN, INPUT_PULLUP); // 9번 핀 버튼
+  
   Monitor_Serial.begin(115200);
   RFID_Serial.begin(115200);
 
-  Monitor_Serial.println(F("===== RSSI 모델 파라미터 계산기 ====="));
-  Monitor_Serial.println();
-  promptForMeasurement(D0_METER);
+  Monitor_Serial.println(F("\n===== 새 환경 기준 데이터 수집기 (버튼) ====="));
+  Monitor_Serial.println(F("측정 범위: 0.1m ~ 1.9m"));
+  Monitor_Serial.print(F("위치당 샘플 수: "));
+  Monitor_Serial.println(SAMPLES_PER_POSITION);
+  
+  // 초기 LED 상태 설정: 대기(노란색 ON, 파란색 OFF)
+  digitalWrite(YELLOW_LED, HIGH);
+  digitalWrite(BLUE_LED, LOW);
+  
+  promptForNextPosition(); 
 }
 
 void loop() {
-  // 버튼이 눌렸을 때만 다음 단계로 진행
-  if (digitalRead(BUTTON_PIN) == LOW) {
-    delay(200); // 디바운싱
+  if (program_state == 0) { // 대기 상태
+    // ⭐⭐ 요청사항 반영: 대기 LED 켜기 ⭐⭐
+    digitalWrite(YELLOW_LED, HIGH);
+    digitalWrite(BLUE_LED, LOW);
 
-    if (currentState == 0) { // P0 측정 시작
-      currentState = 1;
-      p0_value = measureAverageRssi(D0_METER);
-      Monitor_Serial.print(F(" -> 측정된 P0 (1m 평균 RSSI): "));
-      Monitor_Serial.println(p0_value, 2);
-      Monitor_Serial.println();
-      promptForMeasurement(D1_METER);
-      currentState = 2;
+    // ⭐⭐ 요청사항 반영: 9번 핀 버튼으로 측정 시작 ⭐⭐
+    if (digitalRead(BUTTON_PIN) == LOW) {
+      delay(200); // 디바운싱
+      startMeasurement();
     }
-    else if (currentState == 2) { // D1 측정 시작
-      currentState = 3;
-      float rssi_at_d1 = measureAverageRssi(D1_METER);
-      Monitor_Serial.print(F(" -> "));
-      Monitor_Serial.print(D1_METER, 1);
-      Monitor_Serial.print(F("m 평균 RSSI: "));
-      Monitor_Serial.println(rssi_at_d1, 2);
-      Monitor_Serial.println();
+  } 
+  else if (program_state == 1) { // 측정 상태
+    // ⭐⭐ 요청사항 반영: 측정 중 LED 켜기 ⭐⭐
+    digitalWrite(YELLOW_LED, LOW);
+    digitalWrite(BLUE_LED, HIGH);
 
-      // n 값 계산
-      float n_value = (p0_value - rssi_at_d1) / (10.0 * log10(D1_METER / D0_METER));
-      
-      // 최종 결과 출력
-      Monitor_Serial.println(F("===== 최종 계산 결과 ====="));
-      Monitor_Serial.print(F("P0: "));
-      Monitor_Serial.println(p0_value, 4);
-      Monitor_Serial.print(F("n: "));
-      Monitor_Serial.println(n_value, 4);
-      Monitor_Serial.println(F("=========================="));
-      Monitor_Serial.println(F("이 값들을 메인 코드의 P0_FIXED와 N_FIXED에 복사하세요."));
-      
-      currentState = 4; // 완료 상태
+    if (RFID_Serial.available() > 0) {
+      int rssi_dbm = getRssiFromStream();
+      if (rssi_dbm != -1000) {
+        rssi_sum += rssi_dbm;
+        reading_count++;
+        RFID_Serial.write(ReadMulti, 10); 
+      }
     }
-  }
 
-  // 완료 상태일 때 LED 켜기
-  if (currentState == 4) {
-    digitalWrite(LED_PIN, HIGH);
-  } else { // 대기 상태일 때 LED 깜빡이기
-    digitalWrite(LED_PIN, HIGH);
-    delay(250);
-    digitalWrite(LED_PIN, LOW);
-    delay(250);
+    if (reading_count >= SAMPLES_PER_POSITION) {
+      finishMeasurement();
+    }
   }
 }
 
-// 다음 측정을 위해 사용자에게 안내 메시지를 출력하는 함수
-void promptForMeasurement(float distance) {
-  Monitor_Serial.print(F("1. 태그를 "));
-  Monitor_Serial.print(distance, 1);
-  Monitor_Serial.println(F("m 거리에 위치시키세요."));
+void startMeasurement() {
+  program_state = 1; 
+  reading_count = 0;
+  rssi_sum = 0;
+  
+  Monitor_Serial.print(F("... "));
+  Monitor_Serial.print(positions_to_collect[current_pos_index], 1);
+  Monitor_Serial.print(F("m 측정 시작 ("));
+  Monitor_Serial.print(SAMPLES_PER_POSITION);
+  Monitor_Serial.println(F("개 수집) ..."));
+  
+  // ⭐⭐ 요청사항 반영: 측정 시작 부저음 ⭐⭐
+  tone(BUZZER_PIN, 1000, 150);
+
+  RFID_Serial.write(ReadMulti, 10);
+}
+
+void finishMeasurement() {
+  // ⭐⭐ 요청사항 반영: 측정 종료 부저음 ⭐⭐
+  tone(BUZZER_PIN, 1200, 150);
+  
+  if (reading_count > 0) {
+    float avg_rssi = rssi_sum / reading_count;
+    Monitor_Serial.print(F("결과: "));
+    Monitor_Serial.print(reading_count);
+    Monitor_Serial.print(F("개 수신, 평균 RSSI: "));
+    Monitor_Serial.println(avg_rssi, 2);
+  } else {
+    Monitor_Serial.println(F("오류: 유효한 태그를 읽지 못했습니다."));
+  }
+
+  current_pos_index++;
+  if (current_pos_index >= num_positions) {
+    displayFinalReport();
+    digitalWrite(BLUE_LED, LOW);
+    digitalWrite(YELLOW_LED, HIGH); // 완료 후 노란 LED 켜기
+    while(1); 
+  } else {
+    program_state = 0;
+    promptForNextPosition();
+  }
+}
+
+void displayFinalReport() {
+    Monitor_Serial.println(F("\n\n============================================="));
+    Monitor_Serial.println(F("  모든 데이터 수집이 완료되었습니다."));
+    Monitor_Serial.println(F("  측정 결과를 엑셀 등으로 정리하여"));
+    Monitor_Serial.println(F("  분석(중앙값 계산)을 요청해주세요."));
+    Monitor_Serial.println(F("============================================="));
+}
+
+
+void promptForNextPosition() {
+  float pos_to_setup = positions_to_collect[current_pos_index];
+  Monitor_Serial.println();
+  Monitor_Serial.print(F("1. 태그를 [ "));
+  Monitor_Serial.print(pos_to_setup, 1);
+  Monitor_Serial.println(F("m ] 거리에 위치시키세요."));
+  // ⭐⭐ 요청사항 반영: 안내 메시지 수정 ⭐⭐
   Monitor_Serial.println(F("2. 준비되면 버튼을 눌러 측정을 시작하세요."));
 }
 
-// 지정된 거리에서 평균 RSSI를 측정하는 함수
-float measureAverageRssi(float distance) {
-  Monitor_Serial.print(F("... "));
-  Monitor_Serial.print(distance, 1);
-  Monitor_Serial.print(F("m 거리에서 "));
-  Monitor_Serial.print(CALIBRATION_SAMPLES);
-  Monitor_Serial.println(F("개 샘플 수집 중 ..."));
-  
-  digitalWrite(LED_PIN, HIGH); // 측정 중 LED 켜기
-
-  long rssi_sum = 0;
-  int samples_collected = 0;
-
-  // RFID 읽기 명령 전송
-  RFID_Serial.write(ReadMulti, 10);
-  delay(100); // 모듈이 응답할 시간
-
-  while (samples_collected < CALIBRATION_SAMPLES) {
-    if (RFID_Serial.available() > 0) {
-      int rssi = getRssiFromStream();
-      if (rssi != -1000) { // 유효한 RSSI 값일 경우
-        rssi_sum += rssi;
-        samples_collected++;
-        // 읽기 명령을 계속 보내서 스트림 유지
-        if (samples_collected % 10 == 0) {
-           RFID_Serial.write(ReadMulti, 10);
-        }
-      }
-    }
-  }
-  
-  digitalWrite(LED_PIN, LOW); // 측정 완료 LED 끄기
-  return (float)rssi_sum / samples_collected;
-}
-
-// RFID 시리얼 스트림에서 RSSI 값 하나를 파싱하는 함수
 int getRssiFromStream() {
   unsigned int d_add = 0, p_state = 0, c_state = 0;
-  
-  // 타임아웃을 위한 타이머
   unsigned long startTime = millis();
-  while(millis() - startTime < 100) { // 100ms 타임아웃
+  while(millis() - startTime < 100) {
     if(RFID_Serial.available() > 0){
       unsigned int income = RFID_Serial.read();
       if ((income == 0x02) && (p_state == 0)) { p_state = 1; }
@@ -173,14 +188,10 @@ int getRssiFromStream() {
       }
       else if (c_state == 1) {
         d_add++;
-        if (d_add == 6) {
-          return (income > 127) ? (int)income - 256 : (int)income;
-        }
-        else if (d_add >= 21) {
-          return -1000; // 패킷 끝, 실패
-        }
+        if (d_add == 6) { return (income > 127) ? (int)income - 256 : (int)income; }
+        else if (d_add >= 21) { return -1000; }
       }
     }
   }
-  return -1000; // 타임아웃, 실패
+  return -1000;
 }
