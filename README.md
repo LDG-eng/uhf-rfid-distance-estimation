@@ -107,12 +107,13 @@ docs/ → System architecture and experiment documentation
 
 ## Key Contributions
 
-- Embedded multi-stage RSSI stabilization
-- Statistical outlier-based filtering
-- Adaptive weighted averaging
-- Distance-domain inertia compensation
-- Quantitative performance validation
+- Designed a fully embedded multi-stage RSSI stabilization pipeline
+- Implemented statistical outlier rejection with adaptive weighting
+- Introduced distance-domain inertia filtering for temporal stability
+- Experimentally derived log-distance model parameters via multi-point regression
+- Achieved measurable improvement in MAE, RMSE, and short-range accuracy
 
+---
 
 ## 🚀 Quick Start
 
@@ -122,7 +123,7 @@ docs/ → System architecture and experiment documentation
 4. Process raw data using filtering pipeline
 5. Evaluate performance metrics
 
-
+---
 
 ## Related Publication
 
