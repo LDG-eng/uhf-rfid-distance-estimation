@@ -1,53 +1,67 @@
-# Arduino RSSI Processing Firmware
+# Arduino RSSI Distance Estimation Firmware
 
 ## Overview
 
-This firmware collects RSSI data from the R200 UHF RFID reader via serial communication and performs real-time distance estimation.
+This firmware collects RSSI data from the R200 UHF RFID reader and performs real-time distance estimation with a multi-stage hybrid filtering algorithm.
 
-The implementation includes multi-stage RSSI filtering and distance-domain stabilization.
+Both raw and filtered distance results are calculated for performance comparison.
 
 ---
 
-## Core Functions
+## File Structure
 
-1. RSSI acquisition via serial interface
-2. Physical threshold filtering (-85 dBm to -35 dBm)
-3. Sliding window buffering (size = 5)
-4. Statistical outlier rejection (mean ± 1.8σ)
-5. Adaptive weighted averaging (mix ratio = 0.4)
-6. Log-distance path loss conversion
-7. Distance-domain inertia filtering
-8. Real-time performance metric calculation (MAE, RMSE, Accuracy)
+rssi_distance_estimator.ino  
+→ Main firmware implementing RSSI processing and evaluation logic
+
+---
+
+## Processing Pipeline
+
+1. RSSI acquisition via serial interface  
+2. Physical threshold filtering (-85 dBm to -35 dBm)  
+3. Sliding window buffering (size = 5)  
+4. Statistical outlier rejection (mean ± 1.8σ)  
+5. Adaptive mixing (moving average + weighted average)  
+6. Log-distance path loss conversion  
+7. Distance-domain inertia filtering  
+8. Real-time MAE, RMSE, and accuracy computation  
 
 ---
 
 ## Key Parameters
 
-- WINDOW_SIZE = 5
-- OUTLIER_K = 1.8
-- MIX_RATIO = 0.4
-- SAMPLES_PER_POSITION = 300
-- SAMPLES_TO_IGNORE = 5
-- P0 = -64.91
-- n = 1.769
+WINDOW_SIZE = 5  
+OUTLIER_K = 1.8  
+MIX_RATIO = 0.4  
+SAMPLES_PER_POSITION = 300  
+SAMPLES_TO_IGNORE = 5  
+
+Distance model:
+
+P0 = -64.91  
+n = 1.769  
 
 ---
 
-## Processing Flow
+## Filtering Strategy
 
-Raw RSSI  
-→ Threshold Filtering  
-→ Sliding Window  
-→ Outlier Removal  
-→ Adaptive Averaging  
-→ Distance Conversion  
-→ Inertia Filtering  
-→ Metric Evaluation
+### RSSI Domain Filtering
+
+- Reject invalid RSSI values
+- Remove statistical outliers
+- Apply adaptive averaging
+
+### Distance Domain Filtering
+
+Filtered Distance =  
+α × Previous Distance + (1 − α) × Current Distance
+
+A position-dependent inertia factor is applied to stabilize estimation.
 
 ---
 
-## Implementation Notes
+## Notes
 
-- Window is pre-initialized to stabilize early estimates.
-- Initial unstable samples are excluded from evaluation.
-- Both raw and filtered results are computed for comparison.
+- Window is pre-initialized to reduce startup instability.
+- First 5 samples are excluded from evaluation.
+- Both raw and filtered performance metrics are calculated internally.
