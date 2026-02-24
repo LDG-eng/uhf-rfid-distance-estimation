@@ -140,7 +140,7 @@ $$
 
 ---
 
-### Distance-Wise Metrics
+## Distance-Wise Metrics
 
 | Distance | Raw MAE | Filt MAE | Raw RMSE | Filt RMSE | Raw Acc (%) | Filt Acc (%) |
 |----------|---------|----------|----------|-----------|-------------|--------------|
