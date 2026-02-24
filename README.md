@@ -121,3 +121,10 @@ docs/ → System architecture and experiment documentation
 3. Run calibration to estimate P0 and n
 4. Process raw data using filtering pipeline
 5. Evaluate performance metrics
+
+
+
+## Related Publication
+
+A detailed academic paper based on this project was prepared
+as part of undergraduate research work.
