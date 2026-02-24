@@ -176,7 +176,7 @@ Observations:
 - Sliding-window statistical processing embedded  
 - Multi-point regression for P0 and n calibration  
 - Distance-domain inertia for dynamic stabilization  
-- Fully tested across **10 distances × 300 samples**
+- Fully tested across **7 distances × 300 samples**
 
 ---
 
