@@ -210,3 +210,6 @@ Observations:
 - Adaptive weighted averaging  
 - Distance-domain inertia compensation  
 - Quantitative performance validation
+
+© 2026 Dong-Geun Lee  
+uhf-rfid-distance-estimation Portfolio
